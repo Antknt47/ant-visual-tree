@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TreeSvg from "./components/treeSvg/TreeSvg.jsx"
+import TreeSvg from "./components/treeSvg/TreeSvg"
 import { TextField, ThemeProvider, createTheme } from '@mui/material';
 import "./App.css"
 
