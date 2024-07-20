@@ -1,7 +1,7 @@
 {
   "name": "ant-visual-tree",
   "private": true,
-  "homepage": "https://lab.antknt47.com/ant-visual-tree",
+  "homepage": "https://labs.antknt47.com/ant-visual-tree",
   "version": "0.0.1",
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "predeploy": "vite build",
+    "predeploy": "vite build && mv dist ant-visual-tree && mkdir dist && mv ant-visual-tree dist && echo labs.antknt47.com > dist/CNAME",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
