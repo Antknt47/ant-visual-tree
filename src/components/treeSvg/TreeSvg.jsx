@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
+import "./TreeSvg.css";
 
 function deserialize(data) {
   let values = null;
@@ -40,10 +41,32 @@ function TreeSvg(props) {
   const data = deserialize(props.data);
   const [count, setCount] = useState(0);
   const svgRef = useRef();
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   useEffect(() => {
-    // 设置宽度和高度
-    const width = 800;
-    const height = 600;
+    const svgElement = svgRef.current;
+
+    if (svgElement) {
+      const resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          if (entry.target === svgElement) {
+            const { width, height } = entry.contentRect;
+            setDimensions({ width, height });
+          }
+        }
+      });
+
+      resizeObserver.observe(svgElement);
+
+      return () => {
+        resizeObserver.unobserve(svgElement);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+
+    const width = dimensions.width;
+    const height = dimensions.height;
 
     // 创建树布局
     const treeLayout = d3.tree().size([width, height - 200]);
