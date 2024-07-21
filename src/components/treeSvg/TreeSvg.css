@@ -9,18 +9,11 @@
 
 .node circle {
     fill: #ffffff;
-    stroke-width: 1.5px;
     stroke-opacity: 1.0;
     stroke: #000000;
-    r: 40px;
-}
-
-.node text {
-    font: 20px sans-serif;
 }
 
 .link {
     fill: none;
     stroke: #555;
-    stroke-width: 1.5px;
 }

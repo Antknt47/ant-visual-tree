@@ -69,6 +69,34 @@ function TreeSvg(props) {
     }
   }, []);
 
+  function radius(depth) {
+    const baseRadius = 20; // Base radius for the root node
+    if (depth < 4) {
+      return baseRadius; // Nodes with depth less than 4 use fixed radius
+    }
+    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+  }
+
+  function fontSize(depth) {
+    const baseRadius = 20; // Base radius for the root node
+    if (depth < 4) {
+      return baseRadius; // Nodes with depth less than 4 use fixed radius
+    }
+    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+  }
+
+  function strokeWidth(depth) {
+    const baseRadius = 1.5; // Base radius for the root node
+    if (depth < 4) {
+      return baseRadius; // Nodes with depth less than 4 use fixed radius
+    }
+    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+  }
+
+  function mappingY(d) {
+    return d.y - 4 * Math.pow(d.depth, 2) + 200;
+  }
+
   useEffect(() => {
 
     const width = dimensions.width;
@@ -76,7 +104,7 @@ function TreeSvg(props) {
 
     // Create zoom behavior with scale extent
     const zoom = d3.zoom()
-      .scaleExtent([0.1, 10]) // Set the zoom scale range
+      .scaleExtent([0.1, 1000]) // Set the zoom scale range
       .on('zoom', (event) => {
         g.attr('transform', event.transform); // Apply zoom transform
       });
@@ -87,11 +115,24 @@ function TreeSvg(props) {
         const { dx, dy } = event;
         const transform = d3.zoomTransform(svgRef.current);
         g.attr('transform', transform.translate(dx, dy)); // Apply drag transform
+        
       });
 
     // Create tree layout with specified size
     const treeLayout = d3.tree()
-      .size([width, height - 200]);
+      .size([width, height - 200]).
+      separation((a, b) => {
+        const depthA = a.depth;
+        const depthB = b.depth;
+
+        // Adjust spacing based on depth
+        let separation = 1; // Default spacing
+        if (depthA >= 3 || depthB >= 3) { // Starting from the fourth layer
+          const minDepth = Math.min(depthA, depthB);
+          separation = Math.pow(0.5, minDepth - 3);
+        }
+        return 0.1;
+      });
 
     // Convert data into D3 hierarchy format
     if (!data) {
@@ -123,22 +164,26 @@ function TreeSvg(props) {
       .attr("class", "link")
       .attr("fill", "none")
       .attr("stroke", "#ccc")
-      .attr("d", d => `M${d.source.x},${d.source.y + 100} L${d.target.x},${d.target.y + 100}`);
+      .attr("stroke-width", d => strokeWidth(d.source.depth))
+      .attr("d", d => `M${d.source.x},${mappingY(d.source)} L${d.target.x},${mappingY(d.target)}`);
 
     // Create nodes
     const node = g.selectAll(".node")
       .data(root.descendants())
       .enter().append("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${d.y + 100})`);
+      .attr("transform", d => `translate(${d.x},${mappingY(d)})`);
 
     // Add circles to nodes
     node.append("circle")
+      .attr("r", d => radius(d.depth))
+      .attr("stroke-width", d => strokeWidth(d.depth))
 
     // Add text labels to nodes
     node.append("text")
-      .attr("dy", 6)
+      .attr("dy", d => fontSize(d.depth) / 3)
       .attr("x", 0)
+      .attr("font-size", d => fontSize(d.depth))
       .style("text-anchor", "middle")
       .text(d => d.data.name);
   }, [data, dimensions]);

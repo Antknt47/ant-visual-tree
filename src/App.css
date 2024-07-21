@@ -27,5 +27,6 @@
 }
 
 .serialInput {
-  width: 25vw;
+  z-index: 999;
+  width: 300px;
 }

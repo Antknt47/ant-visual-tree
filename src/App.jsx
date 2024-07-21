@@ -43,6 +43,7 @@ function App() {
             helperText="例如: [1,2,3,4,5,null,7,8]"
             defaultValue={serialTreeString}
             onChange={handleInputChange}
+            multiline
           />
         </div>
       </div>
