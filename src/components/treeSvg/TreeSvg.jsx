@@ -56,7 +56,7 @@ function deserialize(data) {
 }
 
 function TreeSvg(props) {
-
+  const ScaleSpeed = 0.8; // Scale speed
   // Deserialize the data and set the maximum length to 100
   const data = deserialize(props.data);
   const svgRef = useRef();
@@ -85,31 +85,25 @@ function TreeSvg(props) {
   }, []);
 
   function radius(depth) {
-    const baseRadius = 20; // Base radius for the root node
-    if (depth < 4) {
-      return baseRadius; // Nodes with depth less than 4 use fixed radius
-    }
-    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+    const baseRadius = 35; // Base radius for the root node
+    return baseRadius * Math.pow(ScaleSpeed, depth); // Starting from the fourth layer, the radius decreases by half each layer
   }
 
   function fontSize(depth) {
     const baseRadius = 20; // Base radius for the root node
-    if (depth < 4) {
-      return baseRadius; // Nodes with depth less than 4 use fixed radius
-    }
-    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+    return baseRadius * Math.pow(ScaleSpeed, depth); // Starting from the fourth layer, the radius decreases by half each layer
   }
 
   function strokeWidth(depth) {
     const baseRadius = 1.5; // Base radius for the root node
-    if (depth < 4) {
-      return baseRadius; // Nodes with depth less than 4 use fixed radius
-    }
-    return baseRadius * Math.pow(0.5, depth - 3); // Starting from the fourth layer, the radius decreases by half each layer
+    return baseRadius * Math.pow(ScaleSpeed, depth); // Starting from the fourth layer, the radius decreases by half each layer
   }
 
-  function mappingY(d) {
-    return d.y - 4 * Math.pow(d.depth, 2) + 200;
+  function mappingY(d, height) {
+    const baseHeight = height/4;
+    const marginTop = 150;
+
+    return (1-Math.pow(ScaleSpeed, d.depth))/(1-ScaleSpeed) * baseHeight + marginTop;
   }
 
   useEffect(() => {
@@ -181,14 +175,14 @@ function TreeSvg(props) {
       .attr("stroke", "#ccc")
       .attr("stroke-width", d => strokeWidth(d.source.depth))
       .attr("opacity", d => d.target.data.name === null ? 0 : 1) // Set opacity based on data
-      .attr("d", d => `M${d.source.x},${mappingY(d.source)} L${d.target.x},${mappingY(d.target)}`);
+      .attr("d", d => `M${d.source.x},${mappingY(d.source, height)} L${d.target.x},${mappingY(d.target, height)}`);
 
     // Create nodes
     const node = g.selectAll(".node")
       .data(root.descendants())
       .enter().append("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${mappingY(d)})`)
+      .attr("transform", d => `translate(${d.x},${mappingY(d, height)})`)
       .attr("opacity", d => d.data.name === null ? 0 : 1); // Set opacity based on data
 
     // Add circles to nodes
