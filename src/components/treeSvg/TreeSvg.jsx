@@ -21,20 +21,35 @@ function deserialize(data) {
     let current = queue.shift();
 
     // Create left child if the value is not null
-    if (values[i] !== null) {
-      let leftChild = { name: values[i], children: [] };
+    let leftChild = null;
+    if (i < values.length && values[i] !== null) {
+      leftChild = { name: values[i], children: [] };
       current.children.push(leftChild);
       queue.push(leftChild);
+    } else if(values[i] == null) {
+      leftChild = { name: null, children: [] };
+      current.children.push(leftChild);
     }
     i++;
 
     // Create right child if the value is not null
+    let rightChild = null;
     if (i < values.length && values[i] !== null) {
-      let rightChild = { name: values[i], children: [] };
+      rightChild = { name: values[i], children: [] };
       current.children.push(rightChild);
       queue.push(rightChild);
+    } else if(values[i] == null) {
+      rightChild = { name: null, children: [] };
+      current.children.push(rightChild);
     }
     i++;
+
+    // Ensure each node has exactly two children or no children
+    if (leftChild && !rightChild) {
+      current.children.push({ name: null, children: [] });
+    } else if (!leftChild && rightChild) {
+      current.children.push({ name: null, children: [] });
+    }
   }
 
   return root;
@@ -165,6 +180,7 @@ function TreeSvg(props) {
       .attr("fill", "none")
       .attr("stroke", "#ccc")
       .attr("stroke-width", d => strokeWidth(d.source.depth))
+      .attr("opacity", d => d.target.data.name === null ? 0 : 1) // Set opacity based on data
       .attr("d", d => `M${d.source.x},${mappingY(d.source)} L${d.target.x},${mappingY(d.target)}`);
 
     // Create nodes
@@ -172,7 +188,8 @@ function TreeSvg(props) {
       .data(root.descendants())
       .enter().append("g")
       .attr("class", "node")
-      .attr("transform", d => `translate(${d.x},${mappingY(d)})`);
+      .attr("transform", d => `translate(${d.x},${mappingY(d)})`)
+      .attr("opacity", d => d.data.name === null ? 0 : 1); // Set opacity based on data
 
     // Add circles to nodes
     node.append("circle")
