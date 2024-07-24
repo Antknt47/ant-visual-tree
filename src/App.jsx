@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import TreeSvg from "./components/treeSvg/TreeSvg"
+import React, { useEffect, useState } from "react";
+import TreeSvg from "./components/treeSvg/TreeSvg";
 import { TextField, ThemeProvider, createTheme } from '@mui/material';
 import "./App.css"
 
@@ -21,16 +21,36 @@ function App() {
     defualtSerialTreeString = "[1,2,3,4,5,null,7,8]";
   }
   const [serialTreeString, setSerialTreeString] = useState(defualtSerialTreeString);
+  const [parsedArray, setParsedArray] = useState([]);
+
+  function loadInput(inputValue) {
+    try {
+      const parsedArrayTemp = JSON.parse(inputValue);
+      if (Array.isArray(parsedArrayTemp)) {
+        setParsedArray(parsedArrayTemp);
+        localStorage.setItem("serialTreeString", inputValue);
+      } else {
+
+      }
+    } catch (error) {
+
+    }
+  }
 
   const handleInputChange = (event) => {
-    setSerialTreeString(event.target.value);
-    localStorage.setItem("serialTreeString", event.target.value)
+    const newValue = event.target.value;
+    loadInput(event.target.value);
   };
+
+  useEffect(()=>{
+    loadInput(serialTreeString);
+  },[])
+
 
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
-        <TreeSvg data={serialTreeString}/>
+        <TreeSvg data={parsedArray}/>
         <div className="overlay">
           {false && <button className="button">按钮</button>}
         </div>

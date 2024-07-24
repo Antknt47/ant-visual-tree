@@ -4,13 +4,7 @@ import "./TreeSvg.css";
 
 // Function to deserialize the JSON data into a tree structure
 function deserialize(data) {
-  let values = null;
-  if (!data || data.length === 0) return null;
-  try {
-    values = JSON.parse(data);
-  } catch (e) {
-    return null;
-  }
+  let values = data;
 
   // Initialize the root of the tree
   let root = { name: values[0], children: [] };
@@ -26,7 +20,7 @@ function deserialize(data) {
       leftChild = { name: values[i], children: [] };
       current.children.push(leftChild);
       queue.push(leftChild);
-    } else if(values[i] == null) {
+    } else if (values[i] == null) {
       leftChild = { name: null, children: [] };
       current.children.push(leftChild);
     }
@@ -38,7 +32,7 @@ function deserialize(data) {
       rightChild = { name: values[i], children: [] };
       current.children.push(rightChild);
       queue.push(rightChild);
-    } else if(values[i] == null) {
+    } else if (values[i] == null) {
       rightChild = { name: null, children: [] };
       current.children.push(rightChild);
     }
@@ -57,8 +51,8 @@ function deserialize(data) {
 
 function TreeSvg(props) {
   const ScaleSpeed = 0.8; // Scale speed
-  // Deserialize the data and set the maximum length to 100
-  const data = deserialize(props.data);
+  const [loadedData, setLoadedData] = useState([]);
+
   const svgRef = useRef();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -100,14 +94,29 @@ function TreeSvg(props) {
   }
 
   function mappingY(d, height) {
-    const baseHeight = height/4;
+    const baseHeight = height / 4;
     const marginTop = 150;
 
-    return (1-Math.pow(ScaleSpeed, d.depth))/(1-ScaleSpeed) * baseHeight + marginTop;
+    return (1 - Math.pow(ScaleSpeed, d.depth)) / (1 - ScaleSpeed) * baseHeight + marginTop;
   }
 
+  // Use Effect to load data in chunks
   useEffect(() => {
+    const data = props.data.slice();
+    const intervalId = setInterval(() => {
+      setLoadedData(prevData => {
+        const nextChunk = data.slice(prevData.length, prevData.length + 100); // 每次加载一个分片
+        if (nextChunk.length === 0) {
+          clearInterval(intervalId);
+        }
+        return [...prevData, ...nextChunk];
+      });
+    }, 100); // 每 500ms 加载一个分片
 
+    return () => clearInterval(intervalId);
+  }, [props.data]);
+
+  useEffect(() => {
     const width = dimensions.width;
     const height = dimensions.height;
 
@@ -124,13 +133,12 @@ function TreeSvg(props) {
         const { dx, dy } = event;
         const transform = d3.zoomTransform(svgRef.current);
         g.attr('transform', transform.translate(dx, dy)); // Apply drag transform
-        
       });
 
     // Create tree layout with specified size
     const treeLayout = d3.tree()
-      .size([width, height - 200]).
-      separation((a, b) => {
+      .size([width, height - 200])
+      .separation((a, b) => {
         const depthA = a.depth;
         const depthB = b.depth;
 
@@ -144,11 +152,8 @@ function TreeSvg(props) {
       });
 
     // Convert data into D3 hierarchy format
-    if (!data) {
-      return;
-    }
-
-    const root = d3.hierarchy(data);
+    const deserializedData = deserialize(loadedData);
+    const root = d3.hierarchy(deserializedData);
     treeLayout(root);
 
     // Select SVG element and apply zoom behavior
@@ -188,7 +193,7 @@ function TreeSvg(props) {
     // Add circles to nodes
     node.append("circle")
       .attr("r", d => radius(d.depth))
-      .attr("stroke-width", d => strokeWidth(d.depth))
+      .attr("stroke-width", d => strokeWidth(d.depth));
 
     // Add text labels to nodes
     node.append("text")
@@ -197,13 +202,14 @@ function TreeSvg(props) {
       .attr("font-size", d => fontSize(d.depth))
       .style("text-anchor", "middle")
       .text(d => d.data.name);
-  }, [data, dimensions]);
-  
+
+  }, [loadedData, dimensions]);
+
   return (
     <>
       <svg xmlns="http://www.w3.org/2000/svg" ref={svgRef} className="treeSvg"></svg>
     </>
-  )
+  );
 }
 
 export default TreeSvg;
