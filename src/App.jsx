@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TreeSvg from "./components/treeSvg/TreeSvg"
 import { TextField, ThemeProvider, createTheme } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import "./App.css"
 
 const theme = createTheme({
@@ -16,6 +17,7 @@ const theme = createTheme({
 });
 
 function App() {
+  const { t } = useTranslation(); // 使用 useTranslation 钩子
   let defualtSerialTreeString = localStorage.getItem("serialTreeString");
   if(!defualtSerialTreeString) {
     defualtSerialTreeString = "[1,2,3,4,5,null,7,8]";
@@ -38,9 +40,9 @@ function App() {
           <TextField 
             className="serialInput"
             id="filled-basic"
-            label="层序字符串"
+            label={t('label')}
             variant="filled"
-            helperText="例如: [1,2,3,4,5,null,7,8]"
+            helperText={t('helperText')}
             defaultValue={serialTreeString}
             onChange={handleInputChange}
             multiline
