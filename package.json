@@ -2,7 +2,7 @@
   "name": "ant-visual-tree",
   "private": true,
   "homepage": "https://labs.antknt47.com/ant-visual-tree",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
