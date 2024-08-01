@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TreeSvg from "./components/treeSvg/TreeSvg"
 import { TextField, ThemeProvider, createTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,11 @@ const theme = createTheme({
 
 function App() {
   const { t } = useTranslation(); // 使用 useTranslation 钩子
+
+  useEffect(() => {
+    document.title = t('title');
+  }, [t]);
+
   let defualtSerialTreeString = localStorage.getItem("serialTreeString");
   if(!defualtSerialTreeString) {
     defualtSerialTreeString = "[1,2,3,4,5,null,7,8]";

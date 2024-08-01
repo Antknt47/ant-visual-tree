@@ -1,4 +1,5 @@
 {
   "label": "シーケンス文字列",
-  "helperText": "例: [1,2,3,4,5,null,7,8]"
+  "helperText": "例: [1,2,3,4,5,null,7,8]",
+  "title": "二分木の可視化ツール - Ant Visual Tree"
 }

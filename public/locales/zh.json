@@ -1,4 +1,5 @@
 {
   "label": "层序字符串",
-  "helperText": "例如: [1,2,3,4,5,null,7,8]"
+  "helperText": "例如: [1,2,3,4,5,null,7,8]",
+  "title": "二叉树的可视化工具 - Ant Visual Tree"
 }

@@ -1,4 +1,5 @@
 {
   "label": "sequence string",
-  "helperText": "For example: [1,2,3,4,5,null,7,8]"
+  "helperText": "For example: [1,2,3,4,5,null,7,8]",
+  "title": "Binary Tree Visualization Tool - Ant Visual Tree"
 }
