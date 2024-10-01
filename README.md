@@ -3,7 +3,7 @@
 
 Demo site: [Antlab - Ant Visual Tree](https://labs.antknt47.com/ant-visual-tree/) 
 
-![demo](demo.png "A cute cat")
+![demo](demo.png "Demo")
 
 Ant Visual Tree is a visualization tool for LeetCode's binary tree level-order traversal strings. It helps users to easily understand and visualize the structure of binary trees from given level-order traversal strings.
 
